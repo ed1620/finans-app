@@ -339,6 +339,21 @@
 
     .btn-ghost:hover { background: rgba(255,255,255,0.13); transform: translateY(-2px); }
 
+    .btn-demo {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent);
+      color: #0d0d0d;
+      font-weight: 700;
+      font-size: 15px;
+      padding: 16px 28px;
+      border-radius: 14px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .btn-demo:hover { background: #d4f55a; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(200,240,78,0.25); }
+
     .hero-trust {
       margin-top: 28px;
       display: flex;
@@ -1145,6 +1160,10 @@
           <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
         </a>
         <a href="#iletisim" class="btn-ghost">İletişime Geç</a>
+        <a href="/app" class="btn-demo" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+          Demoyu Deneyimle
+        </a>
       </div>
       <div class="hero-trust">
         <span class="trust-item"><span aria-hidden="true">✓</span> Tamamen ücretsiz</span>
