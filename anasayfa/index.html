@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KFU – Öğrenciler İçin Akıllı Bütçe Uygulaması</title>
+  <meta name="description" content="KFU ile ay sonu sürprizlerini bitir, harcamalarını kontrol altına al ve daha çok biriktir. Üniversite öğrencileri için tasarlanmış kişisel finans uygulaması." />
+  <meta name="theme-color" content="#2d5a35" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="tr_TR" />
+  <meta property="og:title" content="KFU – Öğrenciler İçin Akıllı Bütçe Uygulaması" />
+  <meta property="og:description" content="Ay sonu stresini azalt, paranı daha bilinçli yönet, hedeflerine daha hızlı ulaş." />
+  <meta property="og:image" content="https://egekfu.com/anasayfa/assets/KFU.png" />
+  <meta property="og:url" content="https://egekfu.com/anasayfa" />
+
+  <!-- Icons -->
+  <link rel="icon" href="./assets/KFU.png" />
+  <link rel="apple-touch-icon" href="./assets/KFU.png" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300;1,9..144,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --g1: #1c3d22;
+      --g2: #2d5a35;
+      --g3: #3d7547;
+      --g4: #4e9459;
+      --accent: #c8f04e;
+      --accent2: #f5c842;
+      --white: #ffffff;
+      --offwhite: #f6f8f4;
+      --text: #1a2e1c;
+      --muted: #6b7f6d;
+      --border: #d4e4d6;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 140px;
+    }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--offwhite);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    h1, h2, h3 { font-family: 'Fraunces', serif; }
+
+    /* ── SCROLL PROGRESS BAR ── */
+    #scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--g3));
+      width: 0%;
+      z-index: 9999;
+      transition: width 0.1s linear;
+    }
+
+    /* ── NOISE TEXTURE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9998;
+      opacity: 0.4;
+    }
+
+    /* ── SKIP LINK (a11y) ── */
+    .skip-link {
+      position: fixed;
+      top: -100%;
+      left: 16px;
+      z-index: 10000;
+      background: var(--white);
+      color: var(--g1);
+      font-weight: 700;
+      padding: 10px 20px;
+      border-radius: 10px;
+      text-decoration: none;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      transition: top 0.2s;
+    }
+    .skip-link:focus { top: 16px; }
+
+    /* ── SITE HEADER (fixed, single row: logo + scrollable links) ── */
+    .site-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 150;
+      padding: 0;
+    }
+
+    .site-header-inner {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 14px;
+      padding: 12px max(20px, calc((100% - 1100px) / 2 + 20px));
+      background: rgba(28, 61, 34, 0.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      transition: background 0.25s ease;
+    }
+
+    .site-header-inner.is-scrolled {
+      background: rgba(28, 61, 34, 0.95);
+      box-shadow: none;
+    }
+
+    .site-header-logo {
+      flex: 0 0 auto;
+      display: block;
+      line-height: 0;
+      text-decoration: none;
+    }
+
+    /* Logo görselleri: çerçeve / gölge / yuvarlak kutu yok */
+    .site-header-logo img,
+    .contact-attr-logo,
+    .cta-logos .cta-logo,
+    .footer-brand img {
+      border: none;
+      outline: none;
+      border-radius: 0;
+      box-shadow: none;
+      background: transparent;
+      object-fit: contain;
+    }
+
+    .site-header-logo img {
+      width: 96px;
+      height: 96px;
+      display: block;
+    }
+
+    .site-header-nav {
+      flex: 1 1 auto;
+      min-width: 0;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .site-header-nav::-webkit-scrollbar { display: none; }
+
+    .site-header-nav a {
+      flex: 0 0 auto;
+      white-space: nowrap;
+      color: rgba(255,255,255,0.78);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 14px;
+      border-radius: 10px;
+      transition: color 0.2s, background 0.2s;
+    }
+
+    .site-header-nav a:hover {
+      color: var(--white);
+      background: rgba(255,255,255,0.08);
+    }
+
+    .site-header-nav a.active {
+      color: var(--g1);
+      background: var(--accent);
+    }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      background: linear-gradient(160deg, var(--g1) 0%, var(--g2) 45%, #1e4a28 100%);
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding: 140px 24px 80px;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -20%;
+      right: -10%;
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(78,148,89,0.25) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -15%;
+      left: -5%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(200,240,78,0.08) 0%, transparent 65%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+      width: 100%;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(200,240,78,0.12);
+      border: 1px solid rgba(200,240,78,0.3);
+      color: var(--accent);
+      padding: 7px 16px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      margin-bottom: 28px;
+      width: fit-content;
+    }
+
+    .badge-dot {
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: badgePulse 2.2s ease-in-out infinite;
+    }
+
+    @keyframes badgePulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .hero h1 {
+      font-size: clamp(40px, 5.5vw, 70px);
+      font-weight: 900;
+      line-height: 1.05;
+      color: var(--white);
+      margin-bottom: 24px;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .hero-sub {
+      font-size: 17px;
+      color: rgba(255,255,255,0.65);
+      line-height: 1.7;
+      max-width: 460px;
+      margin-bottom: 36px;
+      font-weight: 300;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--g1);
+      font-weight: 700;
+      font-size: 15px;
+      padding: 16px 32px;
+      border-radius: 14px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      box-shadow: 0 8px 32px rgba(200,240,78,0.3);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary:hover {
+      background: #d8ff5e;
+      transform: translateY(-2px);
+      box-shadow: 0 14px 40px rgba(200,240,78,0.4);
+    }
+
+    .btn-ghost {
+      background: rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.9);
+      font-weight: 500;
+      font-size: 15px;
+      padding: 16px 28px;
+      border-radius: 14px;
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.15);
+      transition: all 0.2s ease;
+    }
+
+    .btn-ghost:hover { background: rgba(255,255,255,0.13); transform: translateY(-2px); }
+
+    .hero-trust {
+      margin-top: 28px;
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: rgba(255,255,255,0.45);
+      font-size: 13px;
+    }
+
+    .trust-item span { color: var(--accent); font-size: 14px; }
+
+    /* ── PHONE MOCKUP ── */
+    .phone-stage {
+      perspective: 1200px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .phone-wrapper {
+      position: relative;
+      width: 300px;
+    }
+
+    .phone-glow {
+      position: absolute;
+      inset: -30px;
+      background: radial-gradient(ellipse at center, rgba(200,240,78,0.18) 0%, transparent 65%);
+      border-radius: 50%;
+      animation: glowPulse 5s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes glowPulse {
+      0%, 100% { opacity: 0.5; transform: scale(0.95); }
+      50% { opacity: 1; transform: scale(1.05); }
+    }
+
+    .phone-shadow {
+      position: absolute;
+      bottom: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px; height: 30px;
+      background: rgba(0,0,0,0.4);
+      filter: blur(20px);
+      border-radius: 50%;
+    }
+
+    .phone-shell {
+      position: relative;
+      background: linear-gradient(160deg, #3a3a3a 0%, #111 100%);
+      border-radius: 48px;
+      padding: 10px;
+      border: 1px solid rgba(255,255,255,0.15);
+      box-shadow:
+        0 40px 100px rgba(0,0,0,0.6),
+        inset 0 1px 0 rgba(255,255,255,0.1);
+      animation: floatPhone 7s ease-in-out infinite;
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+
+    @keyframes floatPhone {
+      0%, 100% { transform: translateY(0) rotateY(-4deg) rotateX(2deg); }
+      50% { transform: translateY(-12px) rotateY(4deg) rotateX(-1deg); }
+    }
+
+    .phone-shell::before {
+      content: '';
+      position: absolute;
+      right: -3px;
+      top: 120px;
+      width: 3px; height: 70px;
+      background: linear-gradient(180deg, #555 0%, #333 100%);
+      border-radius: 0 3px 3px 0;
+    }
+
+    .phone-screen {
+      background: #f0f0f0;
+      border-radius: 40px;
+      overflow: hidden;
+      position: relative;
+      height: 580px;
+    }
+
+    .dynamic-island {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 110px; height: 28px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 10;
+    }
+
+    .phone-slide {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top;
+      opacity: 0;
+      transition: opacity 500ms ease;
+      pointer-events: none;
+    }
+
+    .phone-slide.active { opacity: 1; }
+
+    .phone-dots {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(8px);
+      padding: 6px 12px;
+      border-radius: 999px;
+      z-index: 10;
+    }
+
+    .phone-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.35);
+      cursor: pointer;
+      border: none;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .phone-dot.active { background: white; transform: scale(1.3); }
+
+    /* ── STATS ── */
+    .stats {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stats-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 52px 24px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .stat-item {
+      text-align: center;
+      padding: 16px 24px;
+      position: relative;
+    }
+
+    .stat-item:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 20%;
+      height: 60%;
+      width: 1px;
+      background: var(--border);
+    }
+
+    .stat-number {
+      font-family: 'Fraunces', serif;
+      font-size: 44px;
+      font-weight: 900;
+      color: var(--g2);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    /* ── FEATURES ── */
+    .features {
+      padding: 100px 24px;
+      background: var(--offwhite);
+    }
+
+    .section-label {
+      display: inline-block;
+      background: rgba(45,90,53,0.08);
+      color: var(--g2);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(45,90,53,0.15);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: clamp(28px, 4vw, 46px);
+      font-weight: 900;
+      color: var(--text);
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+
+    .section-sub {
+      font-size: 16px;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 540px;
+      font-weight: 300;
+    }
+
+    .section-header { text-align: center; margin-bottom: 64px; }
+    .section-header .section-sub { margin: 0 auto; }
+
+    .features-grid {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .feat-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 32px 28px;
+      transition: all 0.28s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--g2), var(--accent));
+      opacity: 0;
+      transition: opacity 0.28s;
+    }
+
+    .feat-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 24px 60px rgba(45,90,53,0.12);
+      border-color: rgba(45,90,53,0.2);
+    }
+
+    .feat-card:hover::before { opacity: 1; }
+
+    .feat-icon {
+      width: 52px; height: 52px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(45,90,53,0.1), rgba(45,90,53,0.05));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(45,90,53,0.1);
+    }
+
+    .feat-card h3 {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .feat-card p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.65;
+      font-weight: 400;
+    }
+
+    .feat-card.featured {
+      background: linear-gradient(145deg, var(--g1) 0%, var(--g2) 100%);
+      border-color: transparent;
+    }
+
+    .feat-card.featured::before { opacity: 1; background: linear-gradient(90deg, var(--accent), rgba(200,240,78,0.3)); }
+    .feat-card.featured .feat-icon { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.15); }
+    .feat-card.featured h3 { color: var(--white); }
+    .feat-card.featured p { color: rgba(255,255,255,0.65); }
+
+    /* ── HOW IT WORKS ── */
+    .how {
+      padding: 100px 24px;
+      background: var(--white);
+    }
+
+    .steps {
+      max-width: 900px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      position: relative;
+    }
+
+    .steps::before {
+      content: '';
+      position: absolute;
+      top: 32px;
+      left: 16.66%;
+      right: 16.66%;
+      height: 1px;
+      background: linear-gradient(90deg, var(--g3), var(--accent), var(--g3));
+    }
+
+    .step {
+      text-align: center;
+      padding: 0 16px;
+    }
+
+    .step-num {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--g2), var(--g3));
+      color: white;
+      font-family: 'Fraunces', serif;
+      font-size: 24px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      box-shadow: 0 8px 24px rgba(45,90,53,0.35);
+    }
+
+    .step h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .step p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.65;
+      font-weight: 300;
+    }
+
+    /* ── WHY KFU ── */
+    .why {
+      padding: 100px 24px;
+      background: var(--offwhite);
+    }
+
+    .why-grid {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+    }
+
+    .why-card {
+      border-radius: 28px;
+      padding: 40px 32px;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .why-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .why-card.dark {
+      background: linear-gradient(145deg, var(--g1) 0%, #1a3520 100%);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 8px 32px rgba(28,61,34,0.3);
+    }
+
+    .why-card.dark:hover { box-shadow: 0 20px 48px rgba(28,61,34,0.4); }
+
+    .why-card.light {
+      background: var(--white);
+      border: 1px solid var(--border);
+    }
+
+    .why-card.light:hover { box-shadow: 0 12px 36px rgba(0,0,0,0.06); }
+
+    .why-card.accent-card {
+      background: linear-gradient(145deg, #f7fde8, #ecf8c0);
+      border: 1px solid rgba(200,240,78,0.4);
+    }
+
+    .why-card.accent-card:hover { box-shadow: 0 12px 36px rgba(200,240,78,0.2); }
+
+    .why-icon {
+      font-size: 36px;
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    .why-card.dark h3 { font-size: 22px; font-weight: 700; color: white; margin-bottom: 12px; }
+    .why-card.dark p { font-size: 15px; color: rgba(255,255,255,0.65); line-height: 1.7; font-weight: 300; }
+    .why-card.light h3 { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 12px; }
+    .why-card.light p { font-size: 15px; color: var(--muted); line-height: 1.7; font-weight: 300; }
+    .why-card.accent-card h3 { font-size: 22px; font-weight: 700; color: var(--g1); margin-bottom: 12px; }
+    .why-card.accent-card p { font-size: 15px; color: #4a6a30; line-height: 1.7; font-weight: 300; }
+
+    /* ── CONTACT ── */
+    .contact {
+      padding: 100px 24px;
+      background: var(--white);
+    }
+
+    .contact-attribution {
+      max-width: 900px;
+      margin: 0 auto 28px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: var(--offwhite);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 20px 24px;
+    }
+
+    .contact-attr-logo {
+      width: 120px;
+      height: 120px;
+      flex-shrink: 0;
+    }
+
+    .contact-attr-title {
+      font-family: 'Fraunces', serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 3px;
+    }
+
+    .contact-attr-sub {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .social-cards {
+      max-width: 900px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .social-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 28px 24px;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+      transition: all 0.25s ease;
+    }
+
+    .social-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 18px 48px rgba(0,0,0,0.08);
+      border-color: transparent;
+    }
+
+    .social-card-icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .social-card-icon svg { display: block; width: 52px; height: 52px; }
+
+    .social-card-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+    }
+
+    .social-card-platform {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .social-card-handle {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text);
+      transition: color 0.2s;
+      word-break: break-all;
+    }
+
+    .social-card:hover .social-card-handle { color: var(--g2); }
+
+    .social-card-desc {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .social-card-arrow {
+      font-size: 16px;
+      color: var(--muted);
+      align-self: flex-start;
+      margin-top: auto;
+      transition: transform 0.2s, color 0.2s;
+      display: inline-block;
+    }
+
+    .social-card:hover .social-card-arrow {
+      transform: translate(3px, -3px);
+      color: var(--g2);
+    }
+
+    /* Instagram card border on hover */
+    .social-card.instagram:hover { box-shadow: 0 18px 48px rgba(214,36,159,0.12); }
+    .social-card.email:hover     { box-shadow: 0 18px 48px rgba(45,90,53,0.12); }
+
+    @media (max-width: 700px) {
+      .social-cards { grid-template-columns: 1fr; }
+      .contact-attribution { flex-direction: column; text-align: center; }
+    }
+
+    /* ── CTA ── */
+    .cta-section {
+      padding: 100px 24px;
+      background: linear-gradient(160deg, var(--g1) 0%, var(--g2) 60%, #1c4a22 100%);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      width: 800px; height: 400px;
+      background: radial-gradient(ellipse, rgba(200,240,78,0.1) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .cta-logos {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin: 0 auto 32px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta-logos .cta-logo {
+      width: clamp(88px, 22vw, 168px);
+      height: clamp(88px, 22vw, 168px);
+      margin: 0;
+      display: block;
+      flex: 0 0 auto;
+      object-fit: contain;
+    }
+
+    .cta-section h2 {
+      font-size: clamp(30px, 4vw, 52px);
+      font-weight: 900;
+      color: white;
+      line-height: 1.15;
+      margin-bottom: 18px;
+    }
+
+    .cta-section h2 em { font-style: italic; color: var(--accent); }
+
+    .cta-section p {
+      font-size: 17px;
+      color: rgba(255,255,255,0.6);
+      max-width: 480px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+      font-weight: 300;
+    }
+
+    .cta-section .btn-primary { font-size: 16px; padding: 18px 40px; }
+
+    .cta-note {
+      margin-top: 20px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.3);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--g1);
+      padding: 40px 24px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .footer-brand img {
+      width: 88px;
+      height: 88px;
+    }
+
+    .footer-brand span { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 700; color: white; }
+    .footer-brand small { font-size: 11px; color: rgba(255,255,255,0.4); display: block; }
+    .footer-copy {
+      font-size: 13px;
+      color: rgba(255,255,255,0.35);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 4px 8px;
+      text-align: center;
+    }
+
+    .footer-copy-sep {
+      color: rgba(255,255,255,0.25);
+      user-select: none;
+    }
+
+    .footer-designed {
+      color: rgba(255,255,255,0.45);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .footer-designed:hover { color: var(--accent); }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .footer-links a {
+      color: rgba(255,255,255,0.45);
+      font-size: 13px;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--accent); }
+
+    /* ── SCROLL-TO-TOP ── */
+    #scroll-top {
+      position: fixed;
+      bottom: 28px;
+      right: 24px;
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: var(--g2);
+      color: white;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(45,90,53,0.4);
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.3s, transform 0.3s, background 0.2s;
+      z-index: 200;
+    }
+
+    #scroll-top.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    #scroll-top:hover { background: var(--g3); }
+
+    #scroll-top svg { width: 18px; height: 18px; }
+
+    /* ── SCROLL REVEAL (only when JS is loaded) ── */
+    .js-ready .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+
+    .js-ready .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    .js-ready .reveal-delay-1 { transition-delay: 0.1s; }
+    .js-ready .reveal-delay-2 { transition-delay: 0.2s; }
+    .js-ready .reveal-delay-3 { transition-delay: 0.3s; }
+    .js-ready .reveal-delay-4 { transition-delay: 0.4s; }
+    .js-ready .reveal-delay-5 { transition-delay: 0.5s; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .hero-inner { grid-template-columns: 1fr; text-align: center; gap: 48px; }
+      .hero-badge { margin: 0 auto 28px; }
+      .hero-sub { margin: 0 auto 36px; }
+      .hero-actions { justify-content: center; }
+      .hero-trust { justify-content: center; }
+      .stats-inner { grid-template-columns: repeat(2, 1fr); }
+      .stat-item:nth-child(2)::after { display: none; }
+      .features-grid { grid-template-columns: 1fr 1fr; }
+      .steps { grid-template-columns: 1fr; }
+      .steps::before { display: none; }
+      .why-grid { grid-template-columns: 1fr; }
+      .contact-grid { grid-template-columns: 1fr; }
+      .footer-inner { flex-direction: column; text-align: center; }
+      .footer-links { justify-content: center; }
+      .site-header-inner { padding: 10px 16px; gap: 10px; }
+      .site-header-logo img { width: 72px; height: 72px; }
+      .site-header-nav a { font-size: 13px; padding: 8px 12px; }
+      html { scroll-padding-top: 118px; }
+      .hero { padding-top: 118px; }
+      .contact-attr-logo { width: 96px; height: 96px; }
+      .footer-brand img { width: 72px; height: 72px; }
+    }
+
+    @media (max-width: 600px) {
+      .features-grid { grid-template-columns: 1fr; }
+      .stats-inner { grid-template-columns: repeat(2, 1fr); }
+      .stat-item::after { display: none !important; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .phone-shell { animation: none; }
+      .phone-glow { animation: none; }
+      .badge-dot { animation: none; }
+      .reveal { transition: none; }
+      #scroll-progress { transition: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Scroll Progress Bar -->
+<div id="scroll-progress" aria-hidden="true"></div>
+
+<!-- Skip Link -->
+<a href="#main" class="skip-link">İçeriğe atla</a>
+
+<header class="site-header" id="site-header">
+  <div class="site-header-inner" id="site-header-inner">
+    <a href="#main" class="site-header-logo" aria-label="KFU anasayfa">
+      <img src="./assets/KFU.png" alt="" width="96" height="96" decoding="async" />
+    </a>
+    <nav class="site-header-nav" aria-label="Sayfa bölümleri">
+      <a href="#ozellikler" data-section="ozellikler">Özellikler</a>
+      <a href="#nasil-calisir" data-section="nasil-calisir">Nasıl Çalışır?</a>
+      <a href="#iletisim" data-section="iletisim">İletişim</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HERO -->
+<main id="main">
+<section class="hero" aria-label="Tanıtım">
+  <div class="hero-grid" aria-hidden="true"></div>
+  <div class="hero-inner">
+    <!-- Left -->
+    <div class="hero-text">
+      <div class="hero-badge" aria-label="Ege Üniversitesi öğrencileri">
+        <span class="badge-dot" aria-hidden="true"></span>
+        Ege Üniversitesi'nden Öğrencilere
+      </div>
+      <h1>Paranı <em>Akıllıca</em><br />Yönetmenin<br />Zamanı Geldi</h1>
+      <p class="hero-sub">
+        KFU ile gelir-gider dengenizi tek ekranda netleştir; gereksiz harcamaları fark et, hedeflerine daha hızlı ulaş ve birikim alışkanlığı kazan.
+      </p>
+      <div class="hero-actions">
+        <a href="#ozellikler" class="btn-primary">
+          Uygulamayı Keşfet
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+        </a>
+        <a href="#iletisim" class="btn-ghost">İletişime Geç</a>
+      </div>
+      <div class="hero-trust">
+        <span class="trust-item"><span aria-hidden="true">✓</span> Tamamen ücretsiz</span>
+        <span class="trust-item"><span aria-hidden="true">✓</span> 1 dakikada kurulum</span>
+        <span class="trust-item"><span aria-hidden="true">✓</span> Verin cihazında kalır</span>
+      </div>
+    </div>
+
+    <!-- Right: Phone -->
+    <div class="phone-stage">
+      <div class="phone-wrapper" id="phoneStage">
+        <div class="phone-glow" aria-hidden="true"></div>
+        <div class="phone-shadow" aria-hidden="true"></div>
+        <div class="phone-shell" id="phoneShell" role="img" aria-label="KFU uygulama ekranları">
+          <div class="phone-screen">
+            <div class="dynamic-island" aria-hidden="true"></div>
+            <img src="./assets/screen-1.png" alt="KFU yan menü ekranı" class="phone-slide active" loading="eager" decoding="async" />
+            <img src="./assets/screen-2.png" alt="KFU hareketler ekranı" class="phone-slide" loading="lazy" decoding="async" />
+            <img src="./assets/screen-3.png" alt="KFU geçmiş harcamalar ekranı" class="phone-slide" loading="lazy" decoding="async" />
+            <img src="./assets/screen-4.png" alt="KFU hedefler ekranı" class="phone-slide" loading="lazy" decoding="async" />
+            <img src="./assets/screen-5.png" alt="KFU raporlar ekranı" class="phone-slide" loading="lazy" decoding="async" />
+            <img src="./assets/screen-6.png" alt="KFU kartlarım ekranı" class="phone-slide" loading="lazy" decoding="async" />
+            <div class="phone-dots" role="group" aria-label="Ekran görselleri">
+              <button class="phone-dot active" data-idx="0" aria-label="1. ekran, aktif"></button>
+              <button class="phone-dot" data-idx="1" aria-label="2. ekran"></button>
+              <button class="phone-dot" data-idx="2" aria-label="3. ekran"></button>
+              <button class="phone-dot" data-idx="3" aria-label="4. ekran"></button>
+              <button class="phone-dot" data-idx="4" aria-label="5. ekran"></button>
+              <button class="phone-dot" data-idx="5" aria-label="6. ekran"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- STATS -->
+<section aria-label="Proje özellikleri">
+  <div class="stats">
+    <div class="stats-inner">
+      <div class="stat-item reveal">
+        <div class="stat-number" data-target="6" data-prefix="" data-suffix="+">6+</div>
+        <div class="stat-label">Uygulama Ekranı</div>
+      </div>
+      <div class="stat-item reveal reveal-delay-1">
+        <div class="stat-number" data-target="6" data-prefix="" data-suffix="">6</div>
+        <div class="stat-label">Temel Özellik</div>
+      </div>
+      <div class="stat-item reveal reveal-delay-2">
+        <div class="stat-number" data-target="100" data-prefix="%" data-suffix="">%100</div>
+        <div class="stat-label">Cihaz İçi Gizlilik</div>
+      </div>
+      <div class="stat-item reveal reveal-delay-3">
+        <div class="stat-number">0 ₺</div>
+        <div class="stat-label">Her Zaman Ücretsiz</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="ozellikler" aria-label="Özellikler">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="section-header reveal">
+      <span class="section-label">Özellikler</span>
+      <h2 class="section-title">Karar vermeni kolaylaştıran<br />net finans ekranları</h2>
+      <p class="section-sub">Sadece veri değil, aksiyon odaklı içgörü: nereye fazla harcadığını gör, bütçeni optimize et, hedefini tuttur.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feat-card reveal reveal-delay-1">
+        <div class="feat-icon" aria-hidden="true">🏠</div>
+        <h3>Tek Bakışta Finans Durumu</h3>
+        <p>Gelir, gider, kalan bakiye ve tasarruf oranını tek panelde gör; ay sonuna güvenle ilerle.</p>
+      </div>
+      <div class="feat-card featured reveal reveal-delay-2">
+        <div class="feat-icon" aria-hidden="true">🔎</div>
+        <h3>Kategori Bazlı Harcama Analizi</h3>
+        <p>Gelir ve giderlerini filtrele; hangi kategoride bütçeyi aştığını anında tespit et.</p>
+      </div>
+      <div class="feat-card reveal reveal-delay-3">
+        <div class="feat-icon" aria-hidden="true">💳</div>
+        <h3>Tüm Hesaplarını Tek Noktada</h3>
+        <p>Banka, kredi, ön ödemeli ve KYK kartlarını bir araya getir; toplam durumunu tek yerde gör.</p>
+      </div>
+      <div class="feat-card reveal reveal-delay-2">
+        <div class="feat-icon" aria-hidden="true">📊</div>
+        <h3>Karar Destekleyen Raporlar</h3>
+        <p>Günlük, haftalık ve aylık trendlerle harcama davranışındaki sapmaları erkenden fark et.</p>
+      </div>
+      <div class="feat-card reveal reveal-delay-3">
+        <div class="feat-icon" aria-hidden="true">🎯</div>
+        <h3>Hedef Odaklı Bütçe Sistemi</h3>
+        <p>Birikim hedefi ve kategori limitleri belirle; planına sadık kaldıkça ilerlemeni takip et.</p>
+      </div>
+      <div class="feat-card reveal reveal-delay-4">
+        <div class="feat-icon" aria-hidden="true">🏆</div>
+        <h3>Oyunlaştırma Sistemi</h3>
+        <p>XP, seviye ve rozet sistemiyle finans rutinini sürdürülebilir ve motive edici hale getir.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="nasil-calisir" aria-label="Nasıl Çalışır?">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="section-header reveal">
+      <span class="section-label">Nasıl Çalışır?</span>
+      <h2 class="section-title">3 adımda kontrolü ele al</h2>
+      <p class="section-sub">Basit bir başlangıç akışıyla ilk günden itibaren finansını görünür ve yönetilebilir hale getir.</p>
+    </div>
+    <div class="steps">
+      <div class="step reveal reveal-delay-1">
+        <div class="step-num" aria-hidden="true">1</div>
+        <h3>Hesaplarını Ekle</h3>
+        <p>Gelir kaynaklarını ve kartlarını ekleyerek finansal fotoğrafını tek noktada toplarsın.</p>
+      </div>
+      <div class="step reveal reveal-delay-2">
+        <div class="step-num" aria-hidden="true">2</div>
+        <h3>Limitlerini Belirle</h3>
+        <p>Kategori bazlı bütçe limitleri tanımlayıp gereksiz harcama alanlarını netleştirirsin.</p>
+      </div>
+      <div class="step reveal reveal-delay-3">
+        <div class="step-num" aria-hidden="true">3</div>
+        <h3>Haftalık İyileştir</h3>
+        <p>Raporları inceleyip planını optimize ederek her hafta daha iyi finans kararları alırsın.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY KFU -->
+<section class="why" id="neden-kfu" aria-label="Neden KFU?">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="section-header reveal">
+      <span class="section-label">Neden KFU?</span>
+      <h2 class="section-title">Sadece takip değil,<br />davranış değişimi sağlar</h2>
+    </div>
+    <div class="why-grid">
+      <div class="why-card dark reveal reveal-delay-1">
+        <span class="why-icon" aria-hidden="true">⚡</span>
+        <h3>Hızlı başla, hemen değer gör</h3>
+        <p>Kurulumu dakikalar içinde tamamla, aynı gün hangi kalemde fazla harcadığını fark et.</p>
+      </div>
+      <div class="why-card light reveal reveal-delay-2">
+        <span class="why-icon" aria-hidden="true">🔒</span>
+        <h3>Gizlilik odaklı altyapı</h3>
+        <p>Finansal verilerin cihazında kalır; dışa bağımlı olmadan güvenle takip yaparsın.</p>
+      </div>
+      <div class="why-card accent-card reveal reveal-delay-3">
+        <span class="why-icon" aria-hidden="true">📈</span>
+        <h3>Ölçülebilir finansal ilerleme</h3>
+        <p>Raporlar ve hedef akışları sayesinde tasarruf performansını net metriklerle takip edersin.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact" id="iletisim" aria-label="İletişim">
+  <div style="max-width:900px;margin:0 auto;">
+    <div class="section-header reveal">
+      <span class="section-label">İletişim</span>
+      <h2 class="section-title">Bize ulaş</h2>
+      <p class="section-sub">Görüş, öneri ve iş birliği taleplerin için aşağıdaki kanallardan ulaşabilirsin.</p>
+    </div>
+
+    <!-- Project attribution -->
+    <div class="contact-attribution reveal">
+      <img src="./assets/KFU.png" alt="KFU logosu" class="contact-attr-logo" loading="lazy" decoding="async" />
+      <div>
+        <p class="contact-attr-title">KFU – Akademik Proje</p>
+        <p class="contact-attr-sub">Ege Üniversitesi Bilgisayar ve Öğretim Teknolojileri Eğitimi Bölümü öğrencileri tarafından geliştirilmiştir.</p>
+      </div>
+    </div>
+
+    <!-- Social media cards -->
+    <div class="social-cards reveal reveal-delay-1">
+
+      <!-- Instagram -->
+      <a href="https://www.instagram.com/egekfu/" target="_blank" rel="noopener noreferrer" class="social-card instagram" aria-label="Instagram'da @egekfu">
+        <div class="social-card-icon">
+          <svg viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <radialGradient id="ig-grad" cx="30%" cy="100%" r="130%" gradientUnits="objectBoundingBox">
+                <stop offset="0%"   stop-color="#fae100"/>
+                <stop offset="22%"  stop-color="#fcb045"/>
+                <stop offset="42%"  stop-color="#fd1d1d"/>
+                <stop offset="62%"  stop-color="#e1306c"/>
+                <stop offset="84%"  stop-color="#833ab4"/>
+                <stop offset="100%" stop-color="#5851db"/>
+              </radialGradient>
+            </defs>
+            <rect width="52" height="52" rx="14" fill="url(#ig-grad)"/>
+            <rect x="13" y="13" width="26" height="26" rx="8" stroke="white" stroke-width="2.5" fill="none"/>
+            <circle cx="26" cy="26" r="6.5" stroke="white" stroke-width="2.5" fill="none"/>
+            <circle cx="34.2" cy="17.8" r="1.8" fill="white"/>
+          </svg>
+        </div>
+        <div class="social-card-info">
+          <span class="social-card-platform">Instagram</span>
+          <span class="social-card-handle">@egekfu</span>
+          <span class="social-card-desc">Güncellemeler ve duyurular</span>
+        </div>
+        <span class="social-card-arrow" aria-hidden="true">↗</span>
+      </a>
+
+      <!-- Email -->
+      <a href="mailto:erendogan@egekfu.com" class="social-card email" aria-label="E-posta gönder">
+        <div class="social-card-icon">
+          <svg viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect width="52" height="52" rx="14" fill="#2d5a35"/>
+            <rect x="11" y="17" width="30" height="20" rx="4" stroke="white" stroke-width="2" fill="none"/>
+            <path d="M11 21l15 10 15-10" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="social-card-info">
+          <span class="social-card-platform">E-posta</span>
+          <span class="social-card-handle">erendogan@egekfu.com</span>
+          <span class="social-card-desc">Doğrudan iletişim</span>
+        </div>
+        <span class="social-card-arrow" aria-hidden="true">↗</span>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" aria-label="Çağrı">
+  <div class="cta-logos reveal">
+    <img src="./assets/KFU.png" alt="KFU logosu" class="cta-logo" loading="lazy" decoding="async" />
+    <img src="./assets/image.png" alt="Ege Üniversitesi logosu" class="cta-logo" loading="lazy" decoding="async" />
+  </div>
+  <h2 class="reveal">Öğrencilerden öğrencilere<br /><em>finansal rehberlik</em></h2>
+  <p class="reveal reveal-delay-1">Ege Üniversitesi öğrencileri tarafından geliştirilen bu projede, geri bildirimlerin bizim için çok değerli.</p>
+  <a href="#iletisim" class="btn-primary reveal reveal-delay-2">
+    İletişim Bilgileri
+    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+  </a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <img src="./assets/KFU.png" alt="KFU logosu" loading="lazy" decoding="async" />
+      <div>
+        <span>KFU</span>
+        <small>Kişisel Finans Uygulaması</small>
+      </div>
+    </div>
+    <p class="footer-copy">
+      <span>© 2026 KFU · Ege Üniversitesi öğrencileri tarafından geliştirildi</span>
+      <span class="footer-copy-sep" aria-hidden="true">·</span>
+      <a href="https://www.linkedin.com/in/erendogan20/" class="footer-designed" target="_blank" rel="noopener noreferrer">Designed by Eren Doğan</a>
+    </p>
+    <nav class="footer-links" aria-label="Footer menü">
+      <a href="#ozellikler">Özellikler</a>
+      <a href="#nasil-calisir">Nasıl Çalışır?</a>
+      <a href="#iletisim">İletişim</a>
+    </nav>
+  </div>
+</footer>
+
+<!-- Scroll to Top Button -->
+<button id="scroll-top" aria-label="Sayfanın başına git" title="Yukarı çık">
+  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/>
+  </svg>
+</button>
+
+<script>
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ── SCROLL PROGRESS BAR ── */
+  const progressBar = document.getElementById('scroll-progress');
+  function updateProgress() {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    if (progressBar) progressBar.style.width = pct + '%';
+  }
+
+  const scrollTopBtn = document.getElementById('scroll-top');
+  const headerInner = document.getElementById('site-header-inner');
+  const navLinks = document.querySelectorAll('.site-header-nav a[data-section]');
+  const sections = ['ozellikler', 'nasil-calisir', 'iletisim'];
+
+  function updateNavOnScroll() {
+    updateProgress();
+    headerInner?.classList.toggle('is-scrolled', window.scrollY > 24);
+
+    let current = '';
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        const rect = el.getBoundingClientRect();
+        if (rect.top <= 110) current = id;
+      }
+    });
+    navLinks.forEach(link => {
+      link.classList.toggle('active', link.dataset.section === current);
+    });
+
+    scrollTopBtn?.classList.toggle('visible', window.scrollY > 400);
+  }
+
+  window.addEventListener('scroll', updateNavOnScroll, { passive: true });
+  updateNavOnScroll();
+
+  /* ── SMOOTH SCROLL ── */
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const href = a.getAttribute('href');
+      if (!href || href === '#') return;
+      const target = document.querySelector(href);
+      if (!target) return;
+      e.preventDefault();
+      target.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'start' });
+      history.pushState(null, '', href);
+    });
+  });
+
+  /* ── SCROLL TO TOP ── */
+  scrollTopBtn?.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+  });
+
+  /* ── PHONE SLIDER ── */
+  const slides = Array.from(document.querySelectorAll('.phone-slide'));
+  const dots = Array.from(document.querySelectorAll('.phone-dot'));
+  let current = 0;
+  let sliderTimer;
+
+  function goTo(idx) {
+    slides[current].classList.remove('active');
+    dots[current].classList.remove('active');
+    dots[current].setAttribute('aria-label', `${current + 1}. ekran`);
+    current = (idx + slides.length) % slides.length;
+    slides[current].classList.add('active');
+    dots[current].classList.add('active');
+    dots[current].setAttribute('aria-label', `${current + 1}. ekran, aktif`);
+  }
+
+  function startTimer() {
+    clearInterval(sliderTimer);
+    if (prefersReducedMotion) return;
+    sliderTimer = setInterval(() => goTo(current + 1), 2800);
+  }
+
+  dots.forEach((dot, i) => {
+    dot.addEventListener('click', () => { goTo(i); startTimer(); });
+  });
+
+  startTimer();
+
+  /* ── PHONE TILT ── */
+  const phoneStage = document.getElementById('phoneStage');
+  const phoneShell = document.getElementById('phoneShell');
+
+  if (phoneStage && phoneShell && !prefersReducedMotion) {
+    phoneStage.addEventListener('mousemove', e => {
+      const r = phoneStage.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5;
+      const y = (e.clientY - r.top) / r.height - 0.5;
+      phoneShell.style.transform = `translateY(-6px) rotateY(${x * 14}deg) rotateX(${-y * 10}deg)`;
+    });
+    phoneStage.addEventListener('mouseleave', () => {
+      phoneShell.style.transform = '';
+    });
+  }
+
+  /* ── SCROLL REVEAL ── */
+  document.body.classList.add('js-ready');
+
+  const revealEls = document.querySelectorAll('.reveal');
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        revealObserver.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.05, rootMargin: '0px 0px -40px 0px' });
+
+  revealEls.forEach(el => revealObserver.observe(el));
+
+  /* ── ANIMATED STAT COUNTERS ── */
+  if (!prefersReducedMotion) {
+    const statNums = document.querySelectorAll('.stat-number[data-target]');
+    const counterObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target;
+        const target = parseFloat(el.dataset.target);
+        const prefix = el.dataset.prefix || '';
+        const suffix = el.dataset.suffix || '';
+        const isDecimal = el.dataset.decimal === 'true';
+        const scale = parseFloat(el.dataset.scale) || 1;
+        const duration = 1800;
+        const startTime = performance.now();
+
+        function animate(now) {
+          const elapsed = now - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          const value = isDecimal
+            ? (eased * (target / 10)).toFixed(1)
+            : Math.round(eased * (target / scale));
+          el.textContent = prefix + (isDecimal ? value : value + (scale > 1 ? 'K' : '')) + suffix;
+          if (progress < 1) requestAnimationFrame(animate);
+        }
+
+        requestAnimationFrame(animate);
+        counterObserver.unobserve(el);
+      });
+    }, { threshold: 0.5 });
+
+    statNums.forEach(el => counterObserver.observe(el));
+  }
+</script>
+
+</body>
+</html>
